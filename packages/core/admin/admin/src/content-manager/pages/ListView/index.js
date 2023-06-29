@@ -114,13 +114,20 @@ function ListView({
     (data) =>
       post(`/content-manager/collection-types/${contentType.uid}/actions/bulkPublish`, data),
     {
-      onSuccess() {
+      async onSuccess() {
         toggleNotification({
           type: 'success',
           message: { id: 'content-manager.success.record.publish', defaultMessage: 'Published' },
         });
 
-        fetchData(`/content-manager/collection-types/${slug}${params}`);
+        const endpoint = getRequestUrl(`collection-types/${slug}${params}`);
+
+        // TODO: This is temporary until the branch is up to date with the validations
+        const {
+          data: { results, pagination: paginationResult },
+        } = await fetchClient.get(endpoint);
+
+        getDataSucceeded(paginationResult, results);
       },
       onError(error) {
         toggleNotification({
