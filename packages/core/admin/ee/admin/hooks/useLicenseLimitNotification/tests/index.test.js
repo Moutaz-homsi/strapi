@@ -4,7 +4,7 @@ import { renderHook } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
 import useLicenseLimitNotification from '..';
-import useLicenseLimits from '../../useLicenseLimits';
+import { useLicenseLimits } from '../../useLicenseLimits';
 
 const baseLicenseInfo = {
   enforcementUserCount: 5,
