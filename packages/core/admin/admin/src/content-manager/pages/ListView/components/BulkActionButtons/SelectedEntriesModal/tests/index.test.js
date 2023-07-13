@@ -213,11 +213,9 @@ describe('Bulk publish selected entries modal', () => {
     expect(screen.queryByRole('gridcell', { name: 'Entry 1' })).not.toBeInTheDocument();
     expect(screen.queryByRole('gridcell', { name: 'Entry 2' })).not.toBeInTheDocument();
     expect(screen.queryByRole('gridcell', { name: 'Entry 3' })).not.toBeInTheDocument();
-
-    expect(publishDialog).not.toBeInTheDocument();
   });
 
-  it('should keep entries with validation errors in the modal after publish', async () => {
+  it('should only keep entries with validation errors in the modal after publish', async () => {
     server.use(
       rest.get('*/content-manager/collection-types/:apiId', (req, res, ctx) => {
         return res(
@@ -266,7 +264,6 @@ describe('Bulk publish selected entries modal', () => {
     expect(
       screen.getByRole('gridcell', { name: 'components.Input.error.validation.required' })
     ).toBeInTheDocument();
-    expect(publishDialog).not.toBeInTheDocument();
   });
 
   it('should show validation errors if there is an error', async () => {

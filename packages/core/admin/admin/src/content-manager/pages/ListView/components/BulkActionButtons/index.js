@@ -162,7 +162,7 @@ const BulkActionButtons = ({
 
   const handleBulkDelete = () => handleBulkAction(onConfirmDeleteAll, toggleDeleteDialog);
   const handleBulkUnpublish = () => handleBulkAction(onConfirmUnpublishAll, toggleUnpublishDialog);
-  const handleToggleSelectedEntriesModal = () =>
+  const handleToggleSelectedEntriesModal = () => {
     setIsSelectedEntriesModalOpen((prev) => {
       if (prev) {
         refetchData();
@@ -170,6 +170,7 @@ const BulkActionButtons = ({
 
       return !prev;
     });
+  };
 
   return (
     <>

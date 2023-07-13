@@ -263,7 +263,7 @@ const BoldChunk = (chunks) => <Typography fontWeight="bold">{chunks}</Typography
  * SelectedEntriesModalContent
  * -----------------------------------------------------------------------------------------------*/
 
-const SelectedEntriesModalContent = ({ toggleModal, refetchModalData }) => {
+const SelectedEntriesModalContent = ({ toggleModal, refetchModalData, setEntriesToFetch }) => {
   const { formatMessage } = useIntl();
   const { selectedEntries, rows, onSelectRow, isLoading, isFetching } = useTableContext();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -289,7 +289,7 @@ const SelectedEntriesModalContent = ({ toggleModal, refetchModalData }) => {
       onSuccess() {
         const update = rowsToDisplay.filter((row) => {
           if (entriesToPublish.includes(row.entity.id)) {
-            // Deselect the entries that have been published
+            // Deselect the entries that have been published from the modal table
             onSelectRow({ name: row.entity.id, value: false });
           }
 
@@ -298,6 +298,8 @@ const SelectedEntriesModalContent = ({ toggleModal, refetchModalData }) => {
         });
 
         setRowsToDisplay(update);
+        // Set the parent's entries to fetch when clicking refresh
+        setEntriesToFetch(update.map(({ entity }) => entity.id));
 
         if (update.length === 0) {
           toggleModal();
@@ -406,6 +408,7 @@ const SelectedEntriesModalContent = ({ toggleModal, refetchModalData }) => {
 SelectedEntriesModalContent.propTypes = {
   toggleModal: PropTypes.func.isRequired,
   refetchModalData: PropTypes.func.isRequired,
+  setEntriesToFetch: PropTypes.func.isRequired,
 };
 
 /* -------------------------------------------------------------------------------------------------
@@ -413,8 +416,10 @@ SelectedEntriesModalContent.propTypes = {
  * -----------------------------------------------------------------------------------------------*/
 
 const SelectedEntriesModal = ({ onToggle }) => {
-  const { selectedEntries } = useTableContext();
+  const { selectedEntries: selectedListViewEntries } = useTableContext();
   const { contentType, components } = useSelector(listViewDomain());
+  // The child table will update this value based on the entries that were published
+  const [entriesToFetch, setEntriesToFetch] = React.useState(selectedListViewEntries);
 
   // We want to keep the selected entries order same as the list view
   const [
@@ -426,7 +431,7 @@ const SelectedEntriesModal = ({ onToggle }) => {
     sort,
     filters: {
       id: {
-        $in: selectedEntries,
+        $in: entriesToFetch,
       },
     },
   };
@@ -465,12 +470,16 @@ const SelectedEntriesModal = ({ onToggle }) => {
   return (
     <Table.Root
       rows={data}
-      defaultSelectedEntries={selectedEntries}
+      defaultSelectedEntries={selectedListViewEntries}
       colCount={4}
       isLoading={isLoading}
       isFetching={isFetching}
     >
-      <SelectedEntriesModalContent toggleModal={onToggle} refetchModalData={refetch} />
+      <SelectedEntriesModalContent
+        setEntriesToFetch={setEntriesToFetch}
+        toggleModal={onToggle}
+        refetchModalData={refetch}
+      />
     </Table.Root>
   );
 };
